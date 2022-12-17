@@ -1,5 +1,5 @@
 # novel_nlp
-tfidf关键字提取
+tfidf关键字提取，使用lac分词
 目前测试了诡秘之主
 
 修改了TfidfVectorizer里边的一个地方，即
