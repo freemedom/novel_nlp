@@ -31,7 +31,8 @@ max_df=0.5
 vectorizer = TfidfVectorizer(token_pattern=u'(?u)\\b[\u4e00-\u9fa5]\\w+\\b',
                              #默认为token_pattern=r"(?u)\b\w\w+\b",
                              stop_words=stopwords,
-                             max_df = max_df)
+                             max_df = max_df,
+                             ngram_range=(1,3))
 X = vectorizer.fit_transform(corpus)
 # print(vectorizer.get_feature_names_out())
 # print(vectorizer.vocabulary_)
@@ -58,4 +59,16 @@ def write_csv(datalist,path):
     test=pd.DataFrame(data=datalist,index=titles)
     test.to_csv(path, encoding='gbk',header=False)#,index=False
     return test
-write_csv(res,'改log关键词'+str(max_df)+'.csv')
+
+
+for id, features in enumerate(res):
+    features_sorted = sorted(features, key=lambda x: len(x.split(" ")))
+    for i,subfeature in enumerate(features_sorted):
+        for longerfeature in features_sorted[i + 1:]:
+            if longerfeature.find(subfeature) > -1:
+                features.remove(subfeature)
+                break
+
+
+
+write_csv(res,'ngram改log关键词'+str(max_df)+'.csv')
