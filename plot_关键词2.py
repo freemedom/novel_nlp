@@ -25,7 +25,9 @@ plt.rcParams['axes.unicode_minus'] = False
 import pandas as pd
 df=pd.read_csv("绘制_test.csv",encoding='gbk', header=None)
 
-list_df=df.iloc[:,1:].values.tolist()
+df[0]=df[0].str.extract(r'(\d+)')
+
+list_df=df.values.tolist()
 
 # user_input = "aaaaabbbbcccdde"
 # i is the node identifier and l is its corresponding label:
@@ -35,7 +37,7 @@ labels = {i: l for i, l in enumerate(list_df)}
 # nodes = labels.keys()
 
 
-left, right, bottom, top, layer_sizes = .1, .9, .1, .9, [10]*int((len(list_df)/10))
+left, right, bottom, top, layer_sizes = .1, .9, .1, .9, [16]*int((len(list_df)/16))
 # 网络离上下左右的距离
 # layter_sizes可以自己调整
 import random
@@ -51,11 +53,14 @@ for i, v in enumerate(layer_sizes):
 
 for x, (left_nodes, right_nodes) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
     for i in range(left_nodes):
-        for j in range(right_nodes):
+        for j in range(right_nodes+20):
             id_left = i + sum(layer_sizes[:x])
             id_right = j + sum(layer_sizes[:x + 1])
+            if id_right >= len(list_df):
+                break
             if(labels[id_left]==labels[id_right]):
                 G.add_edge(id_left, id_right)
+                break
 
 #
 # G = nx.DiGraph()
@@ -66,7 +71,10 @@ for x, (left_nodes, right_nodes) in enumerate(zip(layer_sizes[:-1], layer_sizes[
 pos=nx.get_node_attributes(G,'pos')# 把每个节点中的位置pos信息导出来
 
 plt.figure(figsize=(60, 10))
-nx.draw(G, pos,node_color='white')
+nx.draw(G, pos,node_color='white',
+        edge_color = [random.random() for i in range(len(G.edges))],
+        edge_cmap = plt.cm.Dark2  # matplotlib的调色板，可以搜搜，很多颜色呢
+)
 nx.draw_networkx_labels(G, pos, labels)
 plt.savefig("关键词.png")
 # plt.show()
